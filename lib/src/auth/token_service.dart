@@ -80,20 +80,16 @@ class TokenService {
     _checkString(claims, 'theme');
 
     final rawScopes = claims['scopes'];
-    if (rawScopes == null) {
-      throw HuwiyaClaimsException(claim: 'scopes', reason: 'Missing claim');
-    }
-    if (rawScopes is! List) {
-      throw HuwiyaClaimsException(claim: 'scopes', reason: 'Expected a List');
-    }
-    if (rawScopes.isEmpty) {
-      throw HuwiyaClaimsException(claim: 'scopes', reason: 'Must be non-empty');
-    }
-    if (rawScopes.any((s) => s is! String)) {
-      throw HuwiyaClaimsException(
-        claim: 'scopes',
-        reason: 'All elements must be strings',
-      );
+    if (rawScopes != null) {
+      if (rawScopes is! List) {
+        throw HuwiyaClaimsException(claim: 'scopes', reason: 'Expected a List');
+      }
+      if (rawScopes.any((s) => s is! String)) {
+        throw HuwiyaClaimsException(
+          claim: 'scopes',
+          reason: 'All elements must be strings',
+        );
+      }
     }
 
     final iss = claims['iss'];

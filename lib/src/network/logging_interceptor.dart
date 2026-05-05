@@ -50,11 +50,17 @@ class LoggingInterceptor extends Interceptor {
     debugPrint('  Type    : ${err.type}');
     debugPrint('  URL     : ${err.requestOptions.uri}');
     debugPrint('  Message : ${err.message}');
+    if (err.error != null) {
+      debugPrint('  Cause   : ${err.error.runtimeType}: ${err.error}');
+    }
     if (err.response != null) {
       debugPrint('  Status  : ${err.response!.statusCode}');
       debugPrint('  Body    : ${err.response!.data}');
     }
     debugPrint('  Elapsed : ${elapsed}ms');
+    if (err.stackTrace.toString().isNotEmpty) {
+      debugPrint('  Stack   : ${err.stackTrace}');
+    }
     debugPrint(_separator);
 
     handler.next(err);

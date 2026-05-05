@@ -16,7 +16,7 @@ class HuwiyaConfig {
     required this.projectId,
     required this.clientId,
     required this.redirectUri,
-    required this.scopes,
+    this.scopes = const [],
   });
 
   void validate() {
@@ -48,10 +48,6 @@ class HuwiyaConfig {
       throw HuwiyaConfigException(
         'redirectUri must be a valid URI, got: "$redirectUri"',
       );
-    }
-
-    if (scopes.isEmpty) {
-      throw const HuwiyaConfigException('scopes must not be empty');
     }
 
     for (final scope in scopes) {

@@ -50,7 +50,7 @@ class AuthorizeService {
         'response_type': 'code',
         'client_id': _config.clientId,
         'redirect_uri': _config.redirectUri,
-        'scope': _config.scopes.join(' '),
+        if (_config.scopes.isNotEmpty) 'scope': _config.scopes.join(' '),
         'state': pkce.state,
         'code_challenge': pkce.codeChallenge,
         'code_challenge_method': 'S256',
