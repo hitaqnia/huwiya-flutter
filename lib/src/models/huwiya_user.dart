@@ -1,18 +1,33 @@
-
+/// A signed-in Huwiya user, parsed from validated JWT claims.
 class HuwiyaUser {
-  
+  /// Stable user identifier (ULID, 26 chars).
   final String id;
 
+  /// Display name.
   final String name;
+
+  /// BCP 47 locale tag (e.g. `en-US`).
   final String locale;
+
+  /// IANA timezone (e.g. `Europe/Paris`).
   final String zoneinfo;
+
+  /// Preferred UI theme (e.g. `light` / `dark`).
   final String theme;
+
+  /// OAuth scopes granted to this session.
   final List<String> scopes;
 
-  
+  /// JWT `iss` claim — token issuer (Huwiya ID base URL).
   final String? iss;
+
+  /// JWT `aud` claim — intended audience (project id).
   final String? aud;
+
+  /// JWT `iat` claim — token issuance time.
   final DateTime? iat;
+
+  /// JWT `exp` claim — token expiry time.
   final DateTime? exp;
 
   const HuwiyaUser({

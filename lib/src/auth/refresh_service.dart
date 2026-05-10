@@ -116,7 +116,9 @@ class RefreshService {
           try {
             final token = await getAccessToken();
             options.headers['Authorization'] = 'Bearer $token';
-          } on HuwiyaAuthException {}
+          } on HuwiyaAuthException {
+            // No active session — proceed without an Authorization header.
+          }
           handler.next(options);
         },
       ),

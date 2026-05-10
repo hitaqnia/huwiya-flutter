@@ -67,11 +67,12 @@ class TokenService {
       claims,
       'id',
       extra: (v) {
-        if (v.length != 26)
+        if (v.length != 26) {
           throw HuwiyaClaimsException(
             claim: 'id',
             reason: 'Expected 26 chars (ULID), got ${v.length}',
           );
+        }
       },
     );
     _checkString(claims, 'name');
@@ -145,15 +146,18 @@ class TokenService {
     void Function(String value)? extra,
   }) {
     final val = claims[key];
-    if (val == null)
+    if (val == null) {
       throw HuwiyaClaimsException(claim: key, reason: 'Missing claim');
-    if (val is! String)
+    }
+    if (val is! String) {
       throw HuwiyaClaimsException(
         claim: key,
         reason: 'Expected String, got ${val.runtimeType}',
       );
-    if (val.isEmpty)
+    }
+    if (val.isEmpty) {
       throw HuwiyaClaimsException(claim: key, reason: 'Must be non-empty');
+    }
     extra?.call(val);
   }
 

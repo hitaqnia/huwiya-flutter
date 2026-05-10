@@ -1,14 +1,21 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../auth/auth_notifier.dart';
+import '../auth/auth_state.dart';
 import '../auth/authorize_service.dart';
 import '../auth/refresh_service.dart';
 import '../auth/token_service.dart';
 import '../exceptions/huwiya_exceptions.dart';
+import '../models/huwiya_user.dart';
 import '../providers/sdk_providers.dart';
 import '../storage/secure_storage_service.dart';
 import 'huwiya_config.dart';
 
+/// Entry point for the Huwiya OAuth 2.0 + PKCE Flutter SDK.
+///
+/// Call [initialize] once at app startup, then use [instance] from anywhere.
+/// Subscribe to [authStateStream] for reactive auth state, or read
+/// [currentUser] for a synchronous snapshot.
 class HuwiyaSDK {
   static HuwiyaSDK? _instance;
 
@@ -106,9 +113,25 @@ class HuwiyaSDK {
 
   Future<String> getAccessToken() => _refreshService.getAccessToken();
 
+  /// Broadcast stream of [AuthState] transitions
+  /// (`Unauthenticated` / `Authenticating` / `Authenticated` / `Refreshing` /
+  /// `AuthError`). Use it with `StreamBuilder`, Riverpod's `StreamProvider`,
+  /// `Bloc`, etc.
+  Stream<AuthState> get authStateStream => _notifier.stream;
+
+  /// Synchronous snapshot of the signed-in user, or `null` if there is no
+  /// active session. Cheap to read; safe to call from button callbacks.
+  HuwiyaUser? get currentUser => _notifier.currentUser;
+
+  /// Underlying [AuthStateNotifier]. Most apps should prefer [authStateStream]
+  /// or [currentUser]; this is exposed for advanced integrations.
   AuthStateNotifier get authNotifier => _notifier;
 
+  /// The Riverpod [ProviderContainer] backing the SDK. Useful if you want to
+  /// share providers between the SDK and your own Riverpod tree via
+  /// `UncontrolledProviderScope`.
   ProviderContainer get providerContainer => _container;
 
+  /// The [HuwiyaConfig] this SDK was initialized with.
   HuwiyaConfig get config => _config;
 }

@@ -11,6 +11,7 @@ import '../models/huwiya_user.dart';
 import '../network/dio_client.dart';
 import '../storage/secure_storage_service.dart';
 
+/// Provides the active [HuwiyaConfig]. Overridden by `HuwiyaSDK.initialize`.
 final huwiyaConfigProvider = Provider<HuwiyaConfig>(
   (ref) =>
       throw UnimplementedError('HuwiyaSDK.initialize() must be called first'),
@@ -49,15 +50,18 @@ final refreshServiceProvider = Provider<RefreshService>((ref) {
   );
 });
 
+/// Reactive [AuthState] for Riverpod consumers.
 final authStateProvider = StateNotifierProvider<AuthStateNotifier, AuthState>(
   (ref) => AuthStateNotifier(),
 );
 
+/// Current signed-in user, or `null` when unauthenticated.
 final currentUserProvider = Provider<HuwiyaUser?>((ref) {
   final state = ref.watch(authStateProvider);
   return state is Authenticated ? state.user : null;
 });
 
+/// `true` when the SDK is in the [Authenticated] state.
 final isAuthenticatedProvider = Provider<bool>((ref) {
   return ref.watch(authStateProvider) is Authenticated;
 });

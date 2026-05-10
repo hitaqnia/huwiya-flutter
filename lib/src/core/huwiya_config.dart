@@ -1,14 +1,25 @@
 import '../exceptions/huwiya_exceptions.dart';
 
+/// Configuration for [HuwiyaSDK].
+///
+/// All fields are required except [scopes]. Validation runs eagerly during
+/// `HuwiyaSDK.initialize` and throws [HuwiyaConfigException] on bad input.
 class HuwiyaConfig {
+  /// Base URL of the Huwiya ID server (must be HTTPS).
   final String baseUrl;
 
+  /// Project (tenant) identifier — used to validate the `aud` JWT claim.
   final String projectId;
 
+  /// OAuth 2.0 client identifier registered with Huwiya ID.
   final String clientId;
 
+  /// Redirect URI registered with Huwiya ID. Must use a custom scheme that
+  /// matches the platform setup in your `AndroidManifest.xml` / `Info.plist`
+  /// (e.g. `com.example.app://auth/callback`).
   final String redirectUri;
 
+  /// OAuth scopes to request. Defaults to an empty list (server-default scopes).
   final List<String> scopes;
 
   const HuwiyaConfig({
@@ -19,6 +30,8 @@ class HuwiyaConfig {
     this.scopes = const [],
   });
 
+  /// Validates the config. Throws [HuwiyaConfigException] if any field is
+  /// missing or malformed. Called automatically by `HuwiyaSDK.initialize`.
   void validate() {
     if (baseUrl.isEmpty) {
       throw const HuwiyaConfigException('baseUrl must not be empty');

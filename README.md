@@ -2,6 +2,18 @@
 
 OAuth 2.0 + PKCE authentication for Flutter apps, backed by Huwiya ID.
 
+## Features
+
+- OAuth 2.0 Authorization Code flow with PKCE (S256)
+- Automatic token refresh with in-flight request deduplication
+- Session restore on app launch
+- JWT claims validation (`iss`, `aud`, `exp`, `iat`, plus Huwiya-specific claims)
+- Reactive [`AuthState`](#reactive-auth-state) stream — works with any state
+  management approach
+- First-class Riverpod providers
+- Tokens stored in `flutter_secure_storage` (Keychain / EncryptedSharedPreferences)
+- Typed exception hierarchy
+
 ---
 
 ## Installation
@@ -89,6 +101,8 @@ After initialization, you can also reach the instance anywhere via:
 ```dart
 final sdk = HuwiyaSDK.instance;
 ```
+
+> Calling `HuwiyaSDK.instance` before `initialize` throws `StateError`.
 
 ---
 
@@ -341,3 +355,17 @@ class AuthScreen extends StatelessWidget {
   }
 }
 ```
+
+A complete runnable version lives in [`example/`](example/).
+
+---
+
+## Contributing
+
+Issues and pull requests are welcome at
+<https://github.com/hitaqnia/huwiya-flutter>.
+
+## License
+
+Released under the [MIT License](LICENSE) © Hitaqnia.
+
