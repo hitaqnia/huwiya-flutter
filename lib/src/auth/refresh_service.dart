@@ -38,6 +38,15 @@ class RefreshService {
     );
     if (!isNearExpiry) return stored.accessToken;
 
+    // Without a refresh token there is nothing to refresh with, so keep using
+    // the current access token until it actually expires (callers handle the
+    // eventual 401). This happens when the server only issues a refresh token
+    // on first consent.
+    final refreshToken = stored.refreshToken;
+    if (refreshToken == null || refreshToken.isEmpty) {
+      return stored.accessToken;
+    }
+
     _inflightRefresh ??= _doRefresh().whenComplete(
       () => _inflightRefresh = null,
     );
@@ -53,12 +62,18 @@ class RefreshService {
       throw const HuwiyaAuthException('No active session for refresh');
     }
 
+    final refreshToken = stored.refreshToken;
+    if (refreshToken == null || refreshToken.isEmpty) {
+      await _clearAndSignOut();
+      throw const HuwiyaAuthException('No refresh token available');
+    }
+
     try {
       final response = await _dio.post(
         '/oauth/token',
         data: {
           'grant_type': 'refresh_token',
-          'refresh_token': stored.refreshToken,
+          'refresh_token': refreshToken,
           'client_id': _config.clientId,
         },
       );

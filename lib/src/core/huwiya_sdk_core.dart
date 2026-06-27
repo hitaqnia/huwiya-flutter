@@ -99,7 +99,7 @@ class HuwiyaSDK {
       rethrow;
     } catch (e) {
       final wrapped = HuwiyaAuthException(
-        'Unexpected error during sign-in',
+        'Unexpected error during sign-in: $e',
         cause: e,
       );
       _notifier.setError(wrapped);

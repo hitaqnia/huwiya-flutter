@@ -1,3 +1,15 @@
+## 0.2.1
+
+* **Tolerate a missing `refresh_token`.** OAuth servers often return a
+  `refresh_token` only on the first authorization and omit it on subsequent
+  logins. Sign-in previously crashed with `Unexpected error during sign-in`
+  (a `TypeError` from a non-null cast) in that case. `AuthToken.refreshToken`
+  is now nullable and the storage/refresh paths handle its absence: the session
+  is restored from the access token, and refresh is skipped (the access token is
+  used until it expires) when no refresh token is available.
+* Include the underlying cause in the `Unexpected error during sign-in` message
+  for easier diagnosis.
+
 ## 0.2.0
 
 * **Clock-skew tolerance for JWT validation.** Added `HuwiyaConfig.clockSkewTolerance`

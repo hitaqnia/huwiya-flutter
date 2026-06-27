@@ -26,16 +26,11 @@ class SecureStorageService {
 
   Future<void> saveTokens(AuthToken token) async {
     try {
+      final refreshToken = token.refreshToken;
       await Future.wait([
         _storage.write(
           key: _keyAccessToken,
           value: token.accessToken,
-          aOptions: _androidOptions,
-          iOptions: _iOSOptions,
-        ),
-        _storage.write(
-          key: _keyRefreshToken,
-          value: token.refreshToken,
           aOptions: _androidOptions,
           iOptions: _iOSOptions,
         ),
@@ -45,6 +40,21 @@ class SecureStorageService {
           aOptions: _androidOptions,
           iOptions: _iOSOptions,
         ),
+        // The server may not issue a refresh token (e.g. on a repeat login).
+        // Persist it when present, otherwise clear any stale value.
+        if (refreshToken != null && refreshToken.isNotEmpty)
+          _storage.write(
+            key: _keyRefreshToken,
+            value: refreshToken,
+            aOptions: _androidOptions,
+            iOptions: _iOSOptions,
+          )
+        else
+          _storage.delete(
+            key: _keyRefreshToken,
+            aOptions: _androidOptions,
+            iOptions: _iOSOptions,
+          ),
       ]);
     } catch (e) {
       throw HuwiyaStorageException('Failed to save tokens', cause: e);
@@ -75,7 +85,8 @@ class SecureStorageService {
       final refreshToken = results[1];
       final expiresAtStr = results[2];
 
-      if (accessToken == null || refreshToken == null || expiresAtStr == null) {
+      // A session needs an access token + expiry; the refresh token is optional.
+      if (accessToken == null || expiresAtStr == null) {
         return null;
       }
 
