@@ -1,3 +1,16 @@
+## 0.2.0
+
+* **Clock-skew tolerance for JWT validation.** Added `HuwiyaConfig.clockSkewTolerance`
+  (default 5 minutes) that drives the grace window for the `exp` (and optional `iat`)
+  claim checks, replacing the previous hard-coded 60-second window.
+* **Issued-at validation is now opt-in.** Added `HuwiyaConfig.validateIssuedAt`
+  (default `false`). An `iat` in the future is almost always a wrong *device* clock
+  rather than a security problem, so it no longer blocks sign-in by default. Set
+  `validateIssuedAt: true` to restore strict issued-at checking.
+
+  This fixes sign-in failing with `HuwiyaClaimsException(claim: iat)` on devices/
+  emulators whose clock lags behind the Huwiya ID server.
+
 ## 0.1.0
 
 * Initial release.

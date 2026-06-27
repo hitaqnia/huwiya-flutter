@@ -2,7 +2,7 @@ name: huwiya_sdk
 description: >-
   OAuth 2.0 + PKCE authentication SDK for Flutter, backed by Huwiya ID.
   Reactive auth state, automatic token refresh, JWT claims validation.
-version: 0.1.0
+version: 0.2.0
 homepage: https://github.com/hitaqnia/huwiya-flutter
 repository: https://github.com/hitaqnia/huwiya-flutter
 issue_tracker: https://github.com/hitaqnia/huwiya-flutter/issues

@@ -69,5 +69,38 @@ void main() {
         throwsA(isA<HuwiyaConfigException>()),
       );
     });
+
+    test('defaults clockSkewTolerance to 5 minutes and validateIssuedAt to false', () {
+      const config = HuwiyaConfig(
+        baseUrl: 'https://id.example.com',
+        projectId: 'proj_123',
+        clientId: 'client_abc',
+        redirectUri: 'com.example.app://auth/callback',
+      );
+      expect(config.clockSkewTolerance, const Duration(minutes: 5));
+      expect(config.validateIssuedAt, isFalse);
+    });
+
+    test('accepts a zero clockSkewTolerance', () {
+      const config = HuwiyaConfig(
+        baseUrl: 'https://id.example.com',
+        projectId: 'proj_123',
+        clientId: 'client_abc',
+        redirectUri: 'com.example.app://auth/callback',
+        clockSkewTolerance: Duration.zero,
+      );
+      expect(config.validate, returnsNormally);
+    });
+
+    test('rejects a negative clockSkewTolerance', () {
+      const config = HuwiyaConfig(
+        baseUrl: 'https://id.example.com',
+        projectId: 'proj_123',
+        clientId: 'client_abc',
+        redirectUri: 'com.example.app://auth/callback',
+        clockSkewTolerance: Duration(seconds: -1),
+      );
+      expect(config.validate, throwsA(isA<HuwiyaConfigException>()));
+    });
   });
 }

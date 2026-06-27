@@ -2,8 +2,9 @@ import '../exceptions/huwiya_exceptions.dart';
 
 /// Configuration for [HuwiyaSDK].
 ///
-/// All fields are required except [scopes]. Validation runs eagerly during
-/// `HuwiyaSDK.initialize` and throws [HuwiyaConfigException] on bad input.
+/// All fields are required except [scopes], [clockSkewTolerance], and
+/// [validateIssuedAt]. Validation runs eagerly during `HuwiyaSDK.initialize`
+/// and throws [HuwiyaConfigException] on bad input.
 class HuwiyaConfig {
   /// Base URL of the Huwiya ID server (must be HTTPS).
   final String baseUrl;
@@ -22,12 +23,31 @@ class HuwiyaConfig {
   /// OAuth scopes to request. Defaults to an empty list (server-default scopes).
   final List<String> scopes;
 
+  /// Maximum allowed clock difference between this device and the Huwiya ID
+  /// server when validating time-based JWT claims.
+  ///
+  /// Applied to the `exp` (expiry) check, and to the `iat` (issued-at) check
+  /// when [validateIssuedAt] is enabled. Defaults to 5 minutes — the
+  /// conventional OIDC clock-skew allowance. Must not be negative.
+  final Duration clockSkewTolerance;
+
+  /// Whether to reject access tokens whose `iat` (issued-at) claim is in the
+  /// future beyond [clockSkewTolerance].
+  ///
+  /// Defaults to `false`. An `iat` in the future almost always indicates a
+  /// wrong *device* clock rather than a security problem (the security-relevant
+  /// claim is `exp`), so by default it does not block sign-in. Set to `true`
+  /// to opt into strict issued-at validation.
+  final bool validateIssuedAt;
+
   const HuwiyaConfig({
     required this.baseUrl,
     required this.projectId,
     required this.clientId,
     required this.redirectUri,
     this.scopes = const [],
+    this.clockSkewTolerance = const Duration(minutes: 5),
+    this.validateIssuedAt = false,
   });
 
   /// Validates the config. Throws [HuwiyaConfigException] if any field is
@@ -70,10 +90,17 @@ class HuwiyaConfig {
         );
       }
     }
+
+    if (clockSkewTolerance.isNegative) {
+      throw const HuwiyaConfigException(
+        'clockSkewTolerance must not be negative',
+      );
+    }
   }
 
   @override
   String toString() =>
       'HuwiyaConfig(baseUrl: $baseUrl, projectId: $projectId, clientId: $clientId, '
-      'redirectUri: $redirectUri, scopes: $scopes)';
+      'redirectUri: $redirectUri, scopes: $scopes, '
+      'clockSkewTolerance: $clockSkewTolerance, validateIssuedAt: $validateIssuedAt)';
 }

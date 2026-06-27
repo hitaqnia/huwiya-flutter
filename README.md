@@ -104,6 +104,27 @@ final sdk = HuwiyaSDK.instance;
 
 > Calling `HuwiyaSDK.instance` before `initialize` throws `StateError`.
 
+### Clock-skew & issued-at validation
+
+Time-based JWT claims are validated against the device clock. Two optional
+config fields control how forgiving that validation is:
+
+```dart
+HuwiyaConfig(
+  // ...required fields...
+  clockSkewTolerance: const Duration(minutes: 5), // default
+  validateIssuedAt: false,                        // default
+);
+```
+
+- **`clockSkewTolerance`** — grace window applied to the `exp` (expiry) check
+  (and to `iat` when `validateIssuedAt` is on). Defaults to 5 minutes, the
+  conventional OIDC allowance.
+- **`validateIssuedAt`** — when `false` (the default), a token whose `iat`
+  (issued-at) is in the future does **not** fail sign-in. An `iat` in the future
+  almost always means the *device* clock is wrong, not that the token is
+  invalid. Set it to `true` to enforce strict issued-at checking.
+
 ---
 
 ## Reactive Auth State

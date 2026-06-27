@@ -109,14 +109,14 @@ class TokenService {
       );
     }
 
+    final tolerance = _config.clockSkewTolerance;
+
     final exp = claims['exp'];
     if (exp != null) {
       final expTime = DateTime.fromMillisecondsSinceEpoch(
         (exp as num).toInt() * 1000,
       );
-      if (expTime.isBefore(
-        DateTime.now().subtract(const Duration(seconds: 60)),
-      )) {
+      if (expTime.isBefore(DateTime.now().subtract(tolerance))) {
         throw HuwiyaClaimsException(
           claim: 'exp',
           reason: 'Token has expired (exp: $expTime)',
@@ -124,16 +124,21 @@ class TokenService {
       }
     }
 
-    final iat = claims['iat'];
-    if (iat != null) {
-      final iatTime = DateTime.fromMillisecondsSinceEpoch(
-        (iat as num).toInt() * 1000,
-      );
-      if (iatTime.isAfter(DateTime.now().add(const Duration(seconds: 60)))) {
-        throw HuwiyaClaimsException(
-          claim: 'iat',
-          reason: 'iat is in the future (iat: $iatTime)',
+    // `iat` in the future is almost always a wrong *device* clock rather than a
+    // security issue, so it only fails the token when explicitly opted into via
+    // [HuwiyaConfig.validateIssuedAt]. The grace window is [clockSkewTolerance].
+    if (_config.validateIssuedAt) {
+      final iat = claims['iat'];
+      if (iat != null) {
+        final iatTime = DateTime.fromMillisecondsSinceEpoch(
+          (iat as num).toInt() * 1000,
         );
+        if (iatTime.isAfter(DateTime.now().add(tolerance))) {
+          throw HuwiyaClaimsException(
+            claim: 'iat',
+            reason: 'iat is in the future (iat: $iatTime)',
+          );
+        }
       }
     }
 
